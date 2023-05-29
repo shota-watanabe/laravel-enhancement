@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -59,7 +60,11 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role'
     ];
+
+    const ROLE_ADMIN = 'admin';
+    const ROLE_USER = 'user';
 
     /**
      * The attributes that should be hidden for serialization.
@@ -88,5 +93,10 @@ class User extends Authenticatable
     public function sections(): BelongsToMany
     {
         return $this->belongsToMany(Section::class);
+    }
+
+    public function csv_export_histories(): HasMany
+    {
+        return $this->hasMany(CsvExportHistory::class);
     }
 }
