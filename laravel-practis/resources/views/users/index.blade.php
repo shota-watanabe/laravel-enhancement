@@ -70,10 +70,6 @@
                         {{ $users->links() }}
                     </div>
             </div>
-            @else
-                <div class="bg-white px-4 py-5 border-b border-gray-200 sm:px-6">
-                    <p class="text-lg text-gray-500">部署は登録されていません。</p>
-                </div>
             @endif
         </div>
     </div>
