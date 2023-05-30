@@ -30,6 +30,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('companies', \App\Http\Controllers\CompanyController::class);
     Route::resource('companies.sections', \App\Http\Controllers\SectionController::class);
     Route::resource('sections.users', \App\Http\Controllers\SectionUserController::class)->only(['store', 'destroy']);
+    Route::get('/users', [\App\Http\Controllers\UserController::class, 'index'])->name('users.index');
 });
 
 require __DIR__.'/auth.php';

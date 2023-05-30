@@ -94,9 +94,14 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Section::class);
     }
-
+  
     public function csv_export_histories(): HasMany
     {
         return $this->hasMany(CsvExportHistory::class);
+    }
+  
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
     }
 }
