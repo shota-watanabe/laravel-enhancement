@@ -14,7 +14,7 @@ class UserController extends Controller
         if (Auth::user()->isAdmin()) {
             if ($request->user_name) {
                 $users = User::searchUser($request->user_name)->paginate();
-            } elseif ($request->company_name){
+            } elseif ($request->company_name) {
                 $users = User::searchCompany($request->company_name)->paginate();
             } elseif ($request->section_name) {
                 $users = User::searchSection($request->section_name)->paginate();

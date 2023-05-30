@@ -45,7 +45,8 @@
                         @if(Auth::user()->isAdmin())
                             <div class="px-4 pb-3 flex space-x-2 items-center">
                                 <div>
-                                    <input name="company_name" class="border border-gray-500 py-2" placeholder="会社名を入力">
+                                    <input name="company_name" class="border border-gray-500 py-2"
+                                           placeholder="会社名を入力">
                                 </div>
                                 <div class="px-4">
                                     <button
@@ -57,7 +58,8 @@
                         @endif
                         <div class="px-4 pb-3 flex space-x-2 items-center">
                             <div>
-                                <input name="section_name" class="border border-gray-500 py-2" placeholder="部署名を入力">
+                                <input name="section_name" class="border border-gray-500 py-2"
+                                       placeholder="部署名を入力">
                             </div>
                             <div class="px-4">
                                 <button

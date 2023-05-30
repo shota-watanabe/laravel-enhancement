@@ -118,13 +118,13 @@ class User extends Authenticatable
             // 単語をループで回す
             if (Auth::user()->isAdmin()) {
                 foreach ($keywords as $word) {
-                    $query->where('users.name', 'like', '%'.$word.'%');
+                    $query->where('users.name', 'like', '%' . $word . '%');
                 }
             } else {
                 $company_id = Auth::user()->company_id;
                 $query->where('company_id', $company_id)->where(function ($query) use ($keywords) {
                     foreach ($keywords as $word) {
-                        $query->where('users.name', 'like', '%'.$word.'%');
+                        $query->where('users.name', 'like', '%' . $word . '%');
                     }
                 });
             }
@@ -146,7 +146,7 @@ class User extends Authenticatable
             // 単語をループで回す
             if (Auth::user()->isAdmin()) {
                 foreach ($keywords as $word) {
-                    $query->where('companies.name', 'like', '%'.$word.'%');
+                    $query->where('companies.name', 'like', '%' . $word . '%');
                 }
             }
             return $query;
@@ -176,7 +176,7 @@ class User extends Authenticatable
                 $query->where('company_id', $company_id)->where(function ($query) use ($keywords) {
                     $query->whereHas('sections', function ($query) use ($keywords) {
                         foreach ($keywords as $word) {
-                            $query->Where('name', 'like', '%'.$word.'%');
+                            $query->Where('name', 'like', '%' . $word . '%');
                         }
                     });
                 });
