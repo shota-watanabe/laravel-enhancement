@@ -12,7 +12,7 @@ class UserController extends Controller
     public function index(): View
     {
         if (Auth::user()->isAdmin()) {
-            $users = User::paginate(15);
+            $users = User::paginate();
         } else {
             $users = Auth::user()->company->users()->paginate();
         }

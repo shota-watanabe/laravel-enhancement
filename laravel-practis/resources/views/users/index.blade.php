@@ -66,6 +66,9 @@
                         @endforeach
                         </tbody>
                     </table>
+                    <div class="mt-1 mb-1 flex justify-center">
+                        {{ $users->links() }}
+                    </div>
             </div>
             @else
                 <div class="bg-white px-4 py-5 border-b border-gray-200 sm:px-6">
