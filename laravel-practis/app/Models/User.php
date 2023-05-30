@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Auth;
 use Laravel\Sanctum\HasApiTokens;
 
 /**
@@ -94,14 +95,95 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Section::class);
     }
-  
+
     public function csv_export_histories(): HasMany
     {
         return $this->hasMany(CsvExportHistory::class);
     }
-  
+
     public function isAdmin(): bool
     {
         return $this->role === 'admin';
+    }
+
+    public function scopeSearchUser($query, $user_name)
+    {
+        if (!is_null($user_name)) {
+            // 全角スペースを半角に
+            $spaceConvert = mb_convert_kana($user_name, 's');
+
+            // 空白で区切る
+            $keywords = preg_split('/[\s]+/', $spaceConvert, -1, PREG_SPLIT_NO_EMPTY);
+
+            // 単語をループで回す
+            if (Auth::user()->isAdmin()) {
+                foreach ($keywords as $word) {
+                    $query->where('users.name', 'like', '%'.$word.'%');
+                }
+            } else {
+                $company_id = Auth::user()->company_id;
+                $query->where('company_id', $company_id)->where(function ($query) use ($keywords) {
+                    foreach ($keywords as $word) {
+                        $query->where('users.name', 'like', '%'.$word.'%');
+                    }
+                });
+            }
+            return $query;
+        } else {
+            return;
+        }
+    }
+
+    public function scopeSearchCompany($query, $company_name)
+    {
+        if (!is_null($company_name)) {
+            // 全角スペースを半角に
+            $spaceConvert = mb_convert_kana($company_name, 's');
+
+            // 空白で区切る
+            $keywords = preg_split('/[\s]+/', $spaceConvert, -1, PREG_SPLIT_NO_EMPTY);
+
+            // 単語をループで回す
+            if (Auth::user()->isAdmin()) {
+                foreach ($keywords as $word) {
+                    $query->where('companies.name', 'like', '%'.$word.'%');
+                }
+            }
+            return $query;
+        } else {
+            return;
+        }
+    }
+
+    public function scopeSearchSection($query, $section_name)
+    {
+        if (!is_null($section_name)) {
+            // 全角スペースを半角に
+            $spaceConvert = mb_convert_kana($section_name, 's');
+
+            // 空白で区切る
+            $keywords = preg_split('/[\s]+/', $spaceConvert, -1, PREG_SPLIT_NO_EMPTY);
+
+            // 単語をループで回す
+            if (Auth::user()->isAdmin()) {
+                foreach ($keywords as $word) {
+                    $query->whereHas('sections', function ($query) use ($word) {
+                        $query->where('name', 'like', '%' . $word . '%');
+                    });
+                }
+            } else {
+                $company_id = Auth::user()->company_id;
+                $query->where('company_id', $company_id)->where(function ($query) use ($keywords) {
+                    $query->whereHas('sections', function ($query) use ($keywords) {
+                        foreach ($keywords as $word) {
+                            $query->Where('name', 'like', '%'.$word.'%');
+                        }
+                    });
+                });
+            }
+            return $query;
+        } else {
+            return;
+        }
     }
 }
