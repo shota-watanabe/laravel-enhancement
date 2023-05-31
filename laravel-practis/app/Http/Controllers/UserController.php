@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 
 class UserController extends Controller
 {
@@ -31,6 +32,7 @@ class UserController extends Controller
             }
         }
 
+        Session::put('users', $users);
 
         return view('users.index', compact('users'));
     }

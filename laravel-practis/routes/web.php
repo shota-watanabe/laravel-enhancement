@@ -31,6 +31,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('companies.sections', \App\Http\Controllers\SectionController::class);
     Route::resource('sections.users', \App\Http\Controllers\SectionUserController::class)->only(['store', 'destroy']);
     Route::get('/users', [\App\Http\Controllers\UserController::class, 'index'])->name('users.index');
+    Route::post('/csv_export_histories', [\App\Http\Controllers\CsvExportHistoryController::class, 'store'])->name('csv_export_histories.store');
 });
 
 require __DIR__.'/auth.php';
