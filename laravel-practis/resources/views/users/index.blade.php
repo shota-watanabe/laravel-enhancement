@@ -52,7 +52,7 @@
                             </div>
                         </div>
                     </form>
-                    <form method="POST" action="{{ route('csv_export_histories.store') }}">
+                    <form method="POST" action="{{ route('users.csv_export_histories.store') }}">
                         @csrf
                         <div class="px-4">
                             <button class="ml-auto bg-indigo-50 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded">
