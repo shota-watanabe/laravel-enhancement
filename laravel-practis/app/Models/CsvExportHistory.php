@@ -10,6 +10,11 @@ class CsvExportHistory extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'download_user_id',
+        'file_name',
+    ];
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'download_user_id');

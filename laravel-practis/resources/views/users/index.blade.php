@@ -31,6 +31,7 @@
                 @if(count($users) >= 1)
                     <div class="px-3 py-4">ユーザー一覧</div>
                     <form method="GET" action="{{ route('users.index') }}">
+                        @csrf
                         <div class="px-4 pb-3 flex space-x-2 items-center">
                             <div>
                                 <select name="search_type" class="border border-gray-500 py-2">
@@ -49,6 +50,14 @@
                                     検索する
                                 </button>
                             </div>
+                        </div>
+                    </form>
+                    <form method="POST" action="{{ route('users.csv_export_histories.store') }}">
+                        @csrf
+                        <div class="px-4">
+                            <button class="ml-auto bg-indigo-50 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded">
+                                CSV出力する
+                            </button>
                         </div>
                     </form>
                     <table class="min-w-full divide-y divide-gray-200">
