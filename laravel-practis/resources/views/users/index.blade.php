@@ -30,6 +30,27 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 @if(count($users) >= 1)
                     <div class="px-3 py-4">ユーザー一覧</div>
+                    <form method="GET" action="{{ route('users.index') }}">
+                        <div class="px-4 pb-3 flex space-x-2 items-center">
+                            <div>
+                                <select name="search_type" class="border border-gray-500 py-2">
+                                    <option value="user">ユーザー</option>
+                                    @if(Auth::user()->isAdmin())
+                                        <option value="company">会社</option>
+                                    @endif
+                                    <option value="section">部署</option>
+                                </select>
+                            </div>
+                            <div>
+                                <input name="search_keyword" class="border border-gray-500 py-2" placeholder="検索キーワードを入力">
+                            </div>
+                            <div class="px-4">
+                                <button class="ml-auto bg-indigo-50 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded">
+                                    検索する
+                                </button>
+                            </div>
+                        </div>
+                    </form>
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                         <tr>
@@ -69,8 +90,10 @@
                     <div class="mt-1 mb-1 flex justify-center">
                         {{ $users->links() }}
                     </div>
+                @else
+                    <div>ユーザーはいません。</div>
+                @endif
             </div>
-            @endif
         </div>
     </div>
 </x-app-layout>
