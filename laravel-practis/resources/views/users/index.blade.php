@@ -33,37 +33,19 @@
                     <form method="GET" action="{{ route('users.index') }}">
                         <div class="px-4 pb-3 flex space-x-2 items-center">
                             <div>
-                                <input name="user_name" class="border border-gray-500 py-2" placeholder="ユーザー名を入力">
+                                <select name="search_type" class="border border-gray-500 py-2">
+                                    <option value="user">ユーザー</option>
+                                    @if(Auth::user()->isAdmin())
+                                        <option value="company">会社</option>
+                                    @endif
+                                    <option value="section">部署</option>
+                                </select>
                             </div>
-                            <div class="px-4">
-                                <button
-                                    class="ml-auto bg-indigo-50 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded">
-                                    検索する
-                                </button>
-                            </div>
-                        </div>
-                        @if(Auth::user()->isAdmin())
-                            <div class="px-4 pb-3 flex space-x-2 items-center">
-                                <div>
-                                    <input name="company_name" class="border border-gray-500 py-2"
-                                           placeholder="会社名を入力">
-                                </div>
-                                <div class="px-4">
-                                    <button
-                                        class="ml-auto bg-indigo-50 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded">
-                                        検索する
-                                    </button>
-                                </div>
-                            </div>
-                        @endif
-                        <div class="px-4 pb-3 flex space-x-2 items-center">
                             <div>
-                                <input name="section_name" class="border border-gray-500 py-2"
-                                       placeholder="部署名を入力">
+                                <input name="search_keyword" class="border border-gray-500 py-2" placeholder="検索キーワードを入力">
                             </div>
                             <div class="px-4">
-                                <button
-                                    class="ml-auto bg-indigo-50 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded">
+                                <button class="ml-auto bg-indigo-50 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded">
                                     検索する
                                 </button>
                             </div>
