@@ -3,18 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Models\CsvExportHistory;
-use App\Models\User;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Http\RedirectResponse;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class CsvExportHistoryController extends Controller
 {
+    public function index(): View
+    {
+        $csv_export_histories = Auth::user()->csv_export_histories();
+        return view('csv_export_histories.index', compact('csv_export_histories'));
+    }
+
     public function store(Request $request): StreamedResponse
     {
         $users = session()->get('users');
