@@ -39,7 +39,7 @@ class CsvExportHistoryController extends Controller
                 $user->id,
                 $user->name,
                 $user->company->name,
-                $user->sections->implode(','),
+                $user->sections->implode('name', ', '),
             ]);
         }
 
