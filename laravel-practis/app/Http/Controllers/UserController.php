@@ -12,6 +12,7 @@ class UserController extends Controller
 {
     public function index(Request $request): View
     {
+        session(['keyword' => $request->search_keyword]);
         if (Auth::user()->isAdmin()) {
             if ($request->search_type === 'user') {
                 $users = User::searchUser($request->search_keyword)->paginate()->withQueryString();
