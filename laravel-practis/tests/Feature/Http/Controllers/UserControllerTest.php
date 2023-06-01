@@ -37,7 +37,7 @@ class UserControllerTest extends TestCase
         $this->admin = User::factory()->admin()->create();
     }
 
-    public function test_index(): void
+    public function test_index_search_user_by_user(): void
     {
         $url = route('users.index');
 
@@ -47,13 +47,40 @@ class UserControllerTest extends TestCase
         $this->actingAs($this->user)->get($url)->assertStatus(200);
 
         // ログイン状態で検索ワードを入力して検索
-        $response = $this->actingAs($this->user)->get('/users', [
+        $response = $this->actingAs($this->user)->get($url, [
             'search_type' => 'user',
             'search_keyword' => 'サンプルユーザー',
         ]);
         $response->assertStatus(200);
         $response->assertViewHas('users');
         $response->assertSee('サンプルユーザー');
+    }
+
+    public function test_index_search_company_by_user(): void
+    {
+        $url = route('users.index');
+
+        // ログイン状態で検索ワードを入力して検索
+        $response = $this->actingAs($this->user)->get($url, [
+            'search_type' => 'company',
+            'search_keyword' => 'サンプル会社',
+        ]);
+        $response->assertStatus(200);
+        $response->assertViewHas('users');
         $response->assertSee('サンプル会社');
+    }
+
+    public function test_index_search_section_by_user(): void
+    {
+        $url = route('users.index');
+
+        // ログイン状態で検索ワードを入力して検索
+        $response = $this->actingAs($this->user)->get($url, [
+            'search_type' => 'section',
+            'search_keyword' => 'サンプル部署',
+        ]);
+        $response->assertStatus(200);
+        $response->assertViewHas('users');
+        // $response->assertSee('サンプル部署');
     }
 }
