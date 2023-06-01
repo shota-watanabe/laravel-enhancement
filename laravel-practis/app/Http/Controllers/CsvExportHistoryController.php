@@ -13,7 +13,7 @@ class CsvExportHistoryController extends Controller
 {
     public function index(): View
     {
-        $csv_export_histories = Auth::user()->csv_export_histories();
+        $csv_export_histories = CsvExportHistory::orderBy('created_at', 'desc')->paginate();
         return view('csv_export_histories.index', compact('csv_export_histories'));
     }
 
@@ -27,7 +27,16 @@ class CsvExportHistoryController extends Controller
             'download_user_id' => Auth::user()->id,
             'file_name' => $file_name,
         ]);
+        redirect()->route('login');
         return Storage::download($file_name);
+    }
+
+    public function show(CsvExportHistory $csv_export_history): StreamedResponse
+    {
+        if(Storage::exists($csv_export_history->file_name)) {
+            return Storage::download($csv_export_history->file_name);
+        }
+        throw new \Exception('ファイルが存在しません。');
     }
 
     private function createCsv($users)
