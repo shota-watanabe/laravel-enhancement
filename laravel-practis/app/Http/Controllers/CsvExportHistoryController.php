@@ -3,18 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Models\CsvExportHistory;
-use App\Models\User;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Http\RedirectResponse;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class CsvExportHistoryController extends Controller
 {
+    public function index(): View
+    {
+        $csv_export_histories = CsvExportHistory::orderBy('created_at', 'desc')->paginate();
+        return view('csv_export_histories.index', compact('csv_export_histories'));
+    }
+
     public function store(Request $request): StreamedResponse
     {
         $users = session()->get('users');
@@ -25,7 +27,16 @@ class CsvExportHistoryController extends Controller
             'download_user_id' => Auth::user()->id,
             'file_name' => $file_name,
         ]);
+        redirect()->route('login');
         return Storage::download($file_name);
+    }
+
+    public function show(CsvExportHistory $csv_export_history): StreamedResponse
+    {
+        if(Storage::exists($csv_export_history->file_name)) {
+            return Storage::download($csv_export_history->file_name);
+        }
+        throw new \Exception('ファイルが存在しません。');
     }
 
     private function createCsv($users)
@@ -39,7 +50,7 @@ class CsvExportHistoryController extends Controller
                 $user->id,
                 $user->name,
                 $user->company->name,
-                $user->sections->implode(','),
+                $user->sections->implode('name', ', '),
             ]);
         }
 

@@ -34,7 +34,7 @@
                         @csrf
                         <div class="px-4 pb-3 flex space-x-2 items-center">
                             <div>
-                                <select name="search_type" class="border border-gray-500 py-2">
+                                <select name="search_type" class="border border-gray-500 py-2" title="セレクトボックス">
                                     <option value="user">ユーザー</option>
                                     @if(Auth::user()->isAdmin())
                                         <option value="company">会社</option>
@@ -43,7 +43,7 @@
                                 </select>
                             </div>
                             <div>
-                                <input name="search_keyword" class="border border-gray-500 py-2" placeholder="検索キーワードを入力">
+                                <input title="フリーワード" name="search_keyword" class="border border-gray-500 py-2" placeholder="検索キーワードを入力" value="{{ session('keyword', '') }}">
                             </div>
                             <div class="px-4">
                                 <button class="ml-auto bg-indigo-50 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded">
