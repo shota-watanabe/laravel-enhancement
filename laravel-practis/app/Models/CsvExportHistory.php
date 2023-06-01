@@ -15,7 +15,7 @@ class CsvExportHistory extends Model
         'file_name',
     ];
 
-    public function user(): BelongsTo
+    public function download_user_id(): BelongsTo
     {
         return $this->belongsTo(User::class, 'download_user_id');
     }

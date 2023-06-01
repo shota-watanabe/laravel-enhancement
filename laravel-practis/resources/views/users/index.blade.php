@@ -89,9 +89,11 @@
                                 <td class="px-6 py-4 whitespace-nowrap">{{ $user->id }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap">{{ $user->name }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap">{{ $user->company->name }}</td>
-                                @foreach($user->sections as $section)
-                                    <td class="px-6 py-4 whitespace-nowrap">{{ $section->name }}</td>
-                                @endforeach
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        @foreach($user->sections as $section)
+                                            {{ $section->name }}<br>
+                                        @endforeach
+                                    </td>
                             </tr>
                         @endforeach
                         </tbody>
