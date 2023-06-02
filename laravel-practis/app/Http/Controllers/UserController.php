@@ -17,29 +17,25 @@ class UserController extends Controller
 
     public function index(Request $request): View
     {
+        $searchType = $request->search_type;
+        $searchKeyword = $request->search_keyword;
         if (Auth::user()->isAdmin()) {
-            $searchType = $request->search_type;
-            $searchKeyword = $request->search_keyword;
-
             if ($searchType === 'user') {
-                $users = User::searchUser($searchKeyword)->paginate()->withQueryString();
+                $users = User::with(['company', 'sections'])->searchUser($searchKeyword)->paginate()->withQueryString();
             } elseif ($searchType === 'company') {
-                $users = User::searchCompany($searchKeyword)->paginate()->withQueryString();
+                $users = User::with(['company', 'sections'])->searchCompany($searchKeyword)->paginate()->withQueryString();
             } elseif ($searchType === 'section') {
-                $users = User::searchSection($searchKeyword)->paginate()->withQueryString();
+                $users = User::with(['company', 'sections'])->searchSection($searchKeyword)->paginate()->withQueryString();
             } else {
-                $users = User::paginate()->withQueryString();
+                $users = User::with(['company', 'sections'])->paginate()->withQueryString();
             }
         } else {
-            $searchType = $request->search_type;
-            $searchKeyword = $request->search_keyword;
-
             if ($searchType === 'user') {
-                $users = User::searchUser($searchKeyword)->paginate()->withQueryString();
+                $users = User::with(['company', 'sections'])->searchUser($searchKeyword)->paginate()->withQueryString();
             } elseif ($searchType === 'section') {
-                $users = User::query()->searchSection($searchKeyword)->paginate()->withQueryString();
+                $users = User::with(['company', 'sections'])->searchSection($searchKeyword)->paginate()->withQueryString();
             } else {
-                $users = Auth::user()->company->users()->paginate()->withQueryString();
+                $users = Auth::user()->company->users()->with(['company', 'sections'])->paginate()->withQueryString();
             }
         }
 
