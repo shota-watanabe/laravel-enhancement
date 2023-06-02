@@ -10,7 +10,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
-class CsvExportHistoryController extends TestCase
+class CsvExportHistoryControllerTest extends TestCase
 {
     use RefreshDatabase;
     use WithFaker;
@@ -72,5 +72,10 @@ class CsvExportHistoryController extends TestCase
         $response = $this->actingAs($this->user)->get($url);
         $response->assertStatus(200);
         $response->assertDownload();
+
+        $this->csvExportHistory = CsvExportHistory::factory()->create();
+        $url = route('csv_export_histories.show', $this->csvExportHistory);
+        $response = $this->actingAs($this->user)->get($url);
+        $response->assertStatus(500);
     }
 }
