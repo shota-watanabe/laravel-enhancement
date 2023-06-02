@@ -62,7 +62,7 @@
                                         {{ $csv_export_history->file_name }}
                                     </a>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">{{ $csv_export_history->user->name }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">{{ $csv_export_history->download_user->name }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap">{{ $csv_export_history->created_at }}</td>
                             </tr>
                         @endforeach

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\CsvExportHistory;
+use App\Models\User;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -19,7 +20,32 @@ class CsvExportHistoryController extends Controller
 
     public function store(Request $request): StreamedResponse
     {
-        $users = session()->get('users');
+        if (Auth::user()->isAdmin()) {
+            $searchType = $request->search_type;
+            $searchKeyword = $request->search_keyword;
+
+            if ($searchType === 'user') {
+                $users = User::searchUser($searchKeyword)->paginate()->withQueryString();
+            } elseif ($searchType === 'company') {
+                $users = User::searchCompany($searchKeyword)->paginate()->withQueryString();
+            } elseif ($searchType === 'section') {
+                $users = User::searchSection($searchKeyword)->paginate()->withQueryString();
+            } else {
+                $users = User::paginate()->withQueryString();
+            }
+        } else {
+            $searchType = $request->search_type;
+            $searchKeyword = $request->search_keyword;
+
+            if ($searchType === 'user') {
+                $users = User::searchUser($searchKeyword)->paginate()->withQueryString();
+            } elseif ($searchType === 'section') {
+                $users = User::query()->searchSection($searchKeyword)->paginate()->withQueryString();
+            } else {
+                $users = Auth::user()->company->users()->paginate()->withQueryString();
+            }
+        }
+
         $file_name = sprintf('users-%s.csv', now()->format('YmdHis'));
         $stream = $this->createCsv($users);
         Storage::put($file_name, $stream);
@@ -27,7 +53,6 @@ class CsvExportHistoryController extends Controller
             'download_user_id' => Auth::user()->id,
             'file_name' => $file_name,
         ]);
-        redirect()->route('login');
         return Storage::download($file_name);
     }
 

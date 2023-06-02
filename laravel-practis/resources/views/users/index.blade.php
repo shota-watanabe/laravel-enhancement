@@ -43,7 +43,7 @@
                                 </select>
                             </div>
                             <div>
-                                <input title="フリーワード" name="search_keyword" class="border border-gray-500 py-2" placeholder="検索キーワードを入力" value="{{ session('keyword', '') }}">
+                                <input title="フリーワード" name="search_keyword" class="border border-gray-500 py-2" placeholder="検索キーワードを入力" value="{{ request('search_keyword') }}">
                             </div>
                             <div class="px-4">
                                 <button class="ml-auto bg-indigo-50 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded">
@@ -89,9 +89,11 @@
                                 <td class="px-6 py-4 whitespace-nowrap">{{ $user->id }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap">{{ $user->name }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap">{{ $user->company->name }}</td>
-                                @foreach($user->sections as $section)
-                                    <td class="px-6 py-4 whitespace-nowrap">{{ $section->name }}</td>
-                                @endforeach
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        @foreach($user->sections as $section)
+                                            {{ $section->name }}<br>
+                                        @endforeach
+                                    </td>
                             </tr>
                         @endforeach
                         </tbody>
