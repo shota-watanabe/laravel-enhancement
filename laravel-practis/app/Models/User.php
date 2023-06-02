@@ -122,6 +122,7 @@ class User extends Authenticatable
                 }
             } else {
                 $company_id = Auth::user()->company_id;
+
                 $query->where('company_id', $company_id)->where(function ($query) use ($keywords) {
                     foreach ($keywords as $word) {
                         $query->where('users.name', 'like', '%' . $word . '%');
