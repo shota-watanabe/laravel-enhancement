@@ -106,6 +106,31 @@ class User extends Authenticatable
         return $this->role === 'admin';
     }
 
+    public function keywordSearch($searchType, $searchKeyword)
+    {
+        if (Auth::user()->isAdmin()) {
+            if ($searchType === 'user') {
+                $users = User::with(['company', 'sections'])->searchUser($searchKeyword)->paginate()->withQueryString();
+            } elseif ($searchType === 'company') {
+                $users = User::with(['company', 'sections'])->searchCompany($searchKeyword)->paginate()->withQueryString();
+            } elseif ($searchType === 'section') {
+                $users = User::with(['company', 'sections'])->searchSection($searchKeyword)->paginate()->withQueryString();
+            } else {
+                $users = User::with(['company', 'sections'])->paginate()->withQueryString();
+            }
+        } else {
+            if ($searchType === 'user') {
+                $users = User::with(['company', 'sections'])->searchUser($searchKeyword)->paginate()->withQueryString();
+            } elseif ($searchType === 'section') {
+                $users = User::with(['company', 'sections'])->searchSection($searchKeyword)->paginate()->withQueryString();
+            } else {
+                $users = Auth::user()->company->users()->with(['company', 'sections'])->paginate()->withQueryString();
+            }
+        }
+
+        return $users;
+    }
+
     public function scopeSearchUser($query, $user_name)
     {
         if (!is_null($user_name)) {
