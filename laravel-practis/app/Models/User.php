@@ -170,7 +170,7 @@ class User extends Authenticatable
             // 単語をループで回す
             if (Auth::user()->isAdmin()) {
                 foreach ($keywords as $word) {
-                    $query->whereHas('sections', function ($query) use ($word) {
+                    $query->orWhereHas('sections', function ($query) use ($word) {
                         $query->where('name', 'like', '%' . $word . '%');
                     });
                 }
@@ -178,8 +178,13 @@ class User extends Authenticatable
                 $company_id = Auth::user()->company_id;
                 $query->where('company_id', $company_id)->where(function ($query) use ($keywords) {
                     $query->whereHas('sections', function ($query) use ($keywords) {
-                        foreach ($keywords as $word) {
-                            $query->Where('name', 'like', '%' . $word . '%');
+                        foreach ($keywords as $index => $word) {
+                            // 最初のキーワードに対してはwhereを使用し、それ以降のキーワードに対してはorWhereを使用
+                            if ($index === 0) {
+                                $query->where('name', 'like', '%' . $word . '%');
+                            } else {
+                                $query->orWhere('name', 'like', '%' . $word . '%');
+                            }
                         }
                     });
                 });
