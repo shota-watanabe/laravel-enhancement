@@ -64,6 +64,14 @@ class UserControllerTest extends TestCase
 
         $this->actingAs($this->user)->get($url)->assertStatus(200);
 
+        $url = route('users.index', [
+            'search_type' => 'user',
+            'search_keyword' => '',
+        ]);
+
+        $response = $this->actingAs($this->user)->get($url);
+        $response->assertStatus(200);
+
         // ログイン状態で検索ワードを入力して検索
         $response = $this->actingAs($this->user)->get($url);
         $response->assertStatus(200);
@@ -80,13 +88,11 @@ class UserControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->user)->get($url);
-
         // 一般ユーザーは他社のユーザーを検索できない
         $response->assertDontSee('サンプルアドミン');
 
         $response = $this->actingAs($this->admin)->get($url);
         $response->assertStatus(200);
-
         // 管理者は自社のユーザーを検索できる
         $response->assertSee('サンプルアドミン');
     }
@@ -103,9 +109,16 @@ class UserControllerTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('サンプル会社');
 
-        $response = $this->actingAs($this->admin)->get($url);
+        $url = route('users.index', [
+            'search_type' => 'company',
+            'search_keyword' => '',
+        ]);
+
+        $response = $this->actingAs($this->user)->get($url);
         $response->assertStatus(200);
 
+        $response = $this->actingAs($this->admin)->get($url);
+        $response->assertStatus(200);
         // 管理者は他社を検索できる
         $response->assertSee('サンプル会社');
 
@@ -132,6 +145,14 @@ class UserControllerTest extends TestCase
         $response = $this->actingAs($this->user)->get($url);
         $response->assertStatus(200);
         $response->assertSee('サンプル部署');
+
+        $url = route('users.index', [
+            'search_type' => 'section',
+            'search_keyword' => '',
+        ]);
+
+        $response = $this->actingAs($this->user)->get($url);
+        $response->assertStatus(200);
 
         // 管理者は、他社の部署を検索できる
         $response = $this->actingAs($this->admin)->get($url);
