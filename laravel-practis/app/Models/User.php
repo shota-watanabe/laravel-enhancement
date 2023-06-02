@@ -147,7 +147,7 @@ class User extends Authenticatable
             // 単語をループで回す
             if (Auth::user()->isAdmin()) {
                 foreach ($keywords as $word) {
-                    $query->whereHas('company', function ($query) use ($word) {
+                    $query->orWhereHas('company', function ($query) use ($word) {
                         $query->where('name', 'like', '%' . $word . '%');
                     });
                 }
