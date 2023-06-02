@@ -14,37 +14,16 @@ class CsvExportHistoryController extends Controller
 {
     public function index(): View
     {
-        $csv_export_histories = CsvExportHistory::orderBy('created_at', 'desc')->paginate();
+        $csv_export_histories = CsvExportHistory::with('download_user')->orderBy('created_at', 'desc')->paginate();
         return view('csv_export_histories.index', compact('csv_export_histories'));
     }
 
     public function store(Request $request): StreamedResponse
     {
-        if (Auth::user()->isAdmin()) {
-            $searchType = $request->search_type;
-            $searchKeyword = $request->search_keyword;
-
-            if ($searchType === 'user') {
-                $users = User::searchUser($searchKeyword)->paginate()->withQueryString();
-            } elseif ($searchType === 'company') {
-                $users = User::searchCompany($searchKeyword)->paginate()->withQueryString();
-            } elseif ($searchType === 'section') {
-                $users = User::searchSection($searchKeyword)->paginate()->withQueryString();
-            } else {
-                $users = User::paginate()->withQueryString();
-            }
-        } else {
-            $searchType = $request->search_type;
-            $searchKeyword = $request->search_keyword;
-
-            if ($searchType === 'user') {
-                $users = User::searchUser($searchKeyword)->paginate()->withQueryString();
-            } elseif ($searchType === 'section') {
-                $users = User::query()->searchSection($searchKeyword)->paginate()->withQueryString();
-            } else {
-                $users = Auth::user()->company->users()->paginate()->withQueryString();
-            }
-        }
+        $searchType = $request->search_type;
+        $searchKeyword = $request->search_keyword;
+        $user = New User();
+        $users = $user->keywordSearch($searchType, $searchKeyword);
 
         $file_name = sprintf('users-%s.csv', now()->format('YmdHis'));
         $stream = $this->createCsv($users);
