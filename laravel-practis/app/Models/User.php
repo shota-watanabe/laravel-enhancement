@@ -111,25 +111,23 @@ class User extends Authenticatable
     {
         if (Auth::user()->isAdmin()) {
             if ($searchType === 'user') {
-                $users = self::query()->with(['company', 'sections'])->searchUser($searchKeyword)->paginate()->withQueryString();
+                return $builder->with(['company', 'sections'])->searchUser($searchKeyword);
             } elseif ($searchType === 'company') {
-                $users = self::query()->with(['company', 'sections'])->searchCompany($searchKeyword)->paginate()->withQueryString();
+                return $builder->with(['company', 'sections'])->searchCompany($searchKeyword);
             } elseif ($searchType === 'section') {
-                $users = self::query()->with(['company', 'sections'])->searchSection($searchKeyword)->paginate()->withQueryString();
+                return $builder->with(['company', 'sections'])->searchSection($searchKeyword);
             } else {
-                $users = self::query()->with(['company', 'sections'])->paginate()->withQueryString();
+                return $builder->with(['company', 'sections']);
             }
         } else {
             if ($searchType === 'user') {
-                $users = self::query()->with(['company', 'sections'])->searchUser($searchKeyword)->paginate()->withQueryString();
+                return $builder->with(['company', 'sections'])->searchUser($searchKeyword);
             } elseif ($searchType === 'section') {
-                $users = self::query()->with(['company', 'sections'])->searchSection($searchKeyword)->paginate()->withQueryString();
+                return $builder->with(['company', 'sections'])->searchSection($searchKeyword);
             } else {
-                $users = Auth::user()->company->users()->with(['company', 'sections'])->paginate()->withQueryString();
+                return Auth::user()->company->users()->with(['company', 'sections']);
             }
         }
-
-        return $users;
     }
 
     public function scopeSearchUser($query, $user_name)
