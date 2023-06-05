@@ -52,6 +52,13 @@ class UserControllerTest extends TestCase
         $this->adminSection->users()->attach($this->admin->id);
     }
 
+    public function test_index_by_admin(): void
+    {
+        $url = route('users.index');
+
+        $this->actingAs($this->admin)->get($url)->assertStatus(200);
+    }
+
     public function test_index_search_user_by_user(): void
     {
         $url = route('users.index', [
