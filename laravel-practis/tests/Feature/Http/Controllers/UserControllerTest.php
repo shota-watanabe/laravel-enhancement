@@ -146,6 +146,23 @@ class UserControllerTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('サンプル部署');
 
+        $this->company->sections()->create([
+           'name' => 'テスト部署'
+        ]);
+
+        $this->company->sections->last()->users()->attach($this->user->id);
+
+        $url = route('users.index', [
+            'search_type' => 'section',
+            'search_keyword' => 'サンプル テスト',
+        ]);
+
+        // ログイン状態で検索ワードを入力して検索
+        $response = $this->actingAs($this->user)->get($url);
+        $response->assertStatus(200);
+        $response->assertSee('サンプル部署');
+        $response->assertSee('テスト部署');
+
         $url = route('users.index', [
             'search_type' => 'section',
             'search_keyword' => '',

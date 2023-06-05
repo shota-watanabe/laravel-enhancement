@@ -28,8 +28,7 @@ class CsvExportHistoryController extends Controller
         $file_name = sprintf('users-%s.csv', now()->format('YmdHis'));
         $stream = $this->createCsv($users);
         Storage::put($file_name, $stream);
-        CsvExportHistory::create([
-            'download_user_id' => Auth::user()->id,
+        Auth::user()->csv_export_histories()->create([
             'file_name' => $file_name,
         ]);
         return Storage::download($file_name);

@@ -98,7 +98,7 @@ class User extends Authenticatable
 
     public function csv_export_histories(): HasMany
     {
-        return $this->hasMany(CsvExportHistory::class);
+        return $this->hasMany(CsvExportHistory::class, 'download_user_id');
     }
 
     public function isAdmin(): bool
