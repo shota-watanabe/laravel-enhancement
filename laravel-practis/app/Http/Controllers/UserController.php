@@ -19,8 +19,7 @@ class UserController extends Controller
     {
         $searchType = $request->search_type;
         $searchKeyword = $request->search_keyword;
-        $user = New User();
-        $users = $user->keywordSearch($searchType, $searchKeyword);
+        $users = User::query()->with(['company', 'sections'])->keywordSearch($searchType, $searchKeyword);
 
         return view('users.index', compact('users'));
     }

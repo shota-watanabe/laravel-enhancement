@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -106,23 +107,23 @@ class User extends Authenticatable
         return $this->role === 'admin';
     }
 
-    public function keywordSearch($searchType, $searchKeyword)
+    public function scopeKeywordSearch(Builder $builder, $searchType, $searchKeyword)
     {
         if (Auth::user()->isAdmin()) {
             if ($searchType === 'user') {
-                $users = User::with(['company', 'sections'])->searchUser($searchKeyword)->paginate()->withQueryString();
+                $users = self::query()->with(['company', 'sections'])->searchUser($searchKeyword)->paginate()->withQueryString();
             } elseif ($searchType === 'company') {
-                $users = User::with(['company', 'sections'])->searchCompany($searchKeyword)->paginate()->withQueryString();
+                $users = self::query()->with(['company', 'sections'])->searchCompany($searchKeyword)->paginate()->withQueryString();
             } elseif ($searchType === 'section') {
-                $users = User::with(['company', 'sections'])->searchSection($searchKeyword)->paginate()->withQueryString();
+                $users = self::query()->with(['company', 'sections'])->searchSection($searchKeyword)->paginate()->withQueryString();
             } else {
-                $users = User::with(['company', 'sections'])->paginate()->withQueryString();
+                $users = self::query()->with(['company', 'sections'])->paginate()->withQueryString();
             }
         } else {
             if ($searchType === 'user') {
-                $users = User::with(['company', 'sections'])->searchUser($searchKeyword)->paginate()->withQueryString();
+                $users = self::query()->with(['company', 'sections'])->searchUser($searchKeyword)->paginate()->withQueryString();
             } elseif ($searchType === 'section') {
-                $users = User::with(['company', 'sections'])->searchSection($searchKeyword)->paginate()->withQueryString();
+                $users = self::query()->with(['company', 'sections'])->searchSection($searchKeyword)->paginate()->withQueryString();
             } else {
                 $users = Auth::user()->company->users()->with(['company', 'sections'])->paginate()->withQueryString();
             }

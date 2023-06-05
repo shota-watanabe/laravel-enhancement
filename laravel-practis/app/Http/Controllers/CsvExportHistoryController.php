@@ -20,10 +20,9 @@ class CsvExportHistoryController extends Controller
 
     public function store(Request $request): StreamedResponse
     {
-        $searchType = $request->input('search_type');
+        $searchType = $request->search_type;
         $searchKeyword = $request->search_keyword;
-        $user = Auth::user();
-        $users = $user->keywordSearch($searchType, $searchKeyword);
+        $users = User::query()->with(['company', 'sections'])->keywordSearch($searchType, $searchKeyword);
 
         $file_name = sprintf('users-%s.csv', now()->format('YmdHis'));
         $stream = $this->createCsv($users);
