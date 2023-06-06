@@ -89,6 +89,17 @@ class UserControllerTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('サンプルユーザー');
 
+        // 複数ワードで検索
+        $url = route('users.index', [
+            'search_type' => 'user',
+            'search_keyword' => 'ユーザー アドミン',
+        ]);
+
+        $response = $this->actingAs($this->admin)->get($url);
+        $response->assertStatus(200);
+        $response->assertSee('サンプルユーザー');
+        $response->assertSee('サンプルアドミン');
+
         $url = route('users.index', [
             'search_type' => 'user',
             'search_keyword' => 'サンプルアドミン',
@@ -159,6 +170,7 @@ class UserControllerTest extends TestCase
 
         $this->company->sections->last()->users()->attach($this->user->id);
 
+        // 複数ワードで検索
         $url = route('users.index', [
             'search_type' => 'section',
             'search_keyword' => 'サンプル テスト',

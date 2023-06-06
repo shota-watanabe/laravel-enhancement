@@ -17,9 +17,13 @@ class UserController extends Controller
 
     public function index(Request $request): View
     {
-        $searchType = $request->search_type;
-        $searchKeyword = $request->search_keyword;
-        $users = User::query()->with(['company', 'sections'])->keywordSearch($searchType, $searchKeyword)->paginate()->withQueryString();
+        $users = User::query()
+                 ->with(['company', 'sections'])
+                 ->isNotAdmin($request)
+                 ->searchUser($request)
+                 ->searchCompany($request)
+                 ->searchSection($request)
+                 ->paginate()->withQueryString();
 
         return view('users.index', compact('users'));
     }

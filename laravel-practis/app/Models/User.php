@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Http\Request;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Sanctum\HasApiTokens;
@@ -107,115 +108,76 @@ class User extends Authenticatable
         return $this->role === 'admin';
     }
 
-    public function scopeKeywordSearch(Builder $builder, $searchType, $searchKeyword)
+    public function scopeIsNotAdmin(Builder $builder, Request $request)
     {
-        if (Auth::user()->isAdmin()) {
-            if ($searchType === 'user') {
-                return $builder->with(['company', 'sections'])->searchUser($searchKeyword);
-            } elseif ($searchType === 'company') {
-                return $builder->with(['company', 'sections'])->searchCompany($searchKeyword);
-            } elseif ($searchType === 'section') {
-                return $builder->with(['company', 'sections'])->searchSection($searchKeyword);
-            } else {
-                return $builder->with(['company', 'sections']);
-            }
-        } else {
-            if ($searchType === 'user') {
-                return $builder->with(['company', 'sections'])->searchUser($searchKeyword);
-            } elseif ($searchType === 'section') {
-                return $builder->with(['company', 'sections'])->searchSection($searchKeyword);
-            } else {
-                return Auth::user()->company->users()->with(['company', 'sections']);
-            }
-        }
+        return $builder->when(!$request->user()->isAdmin(), function (Builder $query) use ($request) {
+            $query->where('company_id', $request->user()->company_id);
+        });
     }
 
-    public function scopeSearchUser($query, $user_name)
+    public function scopeSearchUser(Builder $builder, Request $request)
     {
-        if (!is_null($user_name)) {
+        $user_name = $request->search_keyword;
+
+        return $builder->when($request->search_type === 'user' && $request->filled('search_keyword'), function ($query) use ($request, $user_name) {
             // 全角スペースを半角に
             $spaceConvert = mb_convert_kana($user_name, 's');
 
             // 空白で区切る
             $keywords = preg_split('/[\s]+/', $spaceConvert, -1, PREG_SPLIT_NO_EMPTY);
 
-            // 単語をループで回す
-            if (Auth::user()->isAdmin()) {
-                foreach ($keywords as $word) {
+            foreach ($keywords as $index => $word) {
+                // 最初のキーワードに対してはwhereを使用し、それ以降のキーワードに対してはorWhereを使用
+                if ($index === 0) {
+                    $query->where('users.name', 'like', '%' . $word . '%');
+                } else {
                     $query->orWhere('users.name', 'like', '%' . $word . '%');
                 }
-            } else {
-                $company_id = Auth::user()->company_id;
-
-                $query->where('company_id', $company_id)->where(function ($query) use ($keywords) {
-                    foreach ($keywords as $word) {
-                        $query->orWhere('users.name', 'like', '%' . $word . '%');
-                    }
-                });
             }
             return $query;
-        } else {
-            return;
-        }
+        });
     }
 
-    public function scopeSearchCompany($query, $company_name)
+    public function scopeSearchCompany(Builder $builder, Request $request)
     {
-        if (!is_null($company_name)) {
+        $company_name = $request->search_keyword;
+
+        // 単語をループで回す
+        return $builder->when($request->search_type === 'company' && $request->filled('search_keyword'), function ($query) use ($company_name) {
             // 全角スペースを半角に
             $spaceConvert = mb_convert_kana($company_name, 's');
 
             // 空白で区切る
             $keywords = preg_split('/[\s]+/', $spaceConvert, -1, PREG_SPLIT_NO_EMPTY);
-
-            // 単語をループで回す
-            if (Auth::user()->isAdmin()) {
-                foreach ($keywords as $word) {
-                    $query->orWhereHas('company', function ($query) use ($word) {
-                        $query->where('name', 'like', '%' . $word . '%');
-                    });
-                }
+            foreach ($keywords as $word) {
+                $query->orWhereHas('company', function ($query) use ($word) {
+                    $query->where('name', 'like', '%' . $word . '%');
+                });
             }
-            return $query;
-        } else {
-            return;
-        }
+        });
     }
 
-    public function scopeSearchSection($query, $section_name)
+    public function scopeSearchSection(Builder $builder, Request $request)
     {
-        if (!is_null($section_name)) {
+        $section_name = $request->search_keyword;
+
+        return $builder->when($request->search_type === 'section' && $request->filled('search_keyword'), function ($query) use ($section_name) {
             // 全角スペースを半角に
             $spaceConvert = mb_convert_kana($section_name, 's');
 
             // 空白で区切る
             $keywords = preg_split('/[\s]+/', $spaceConvert, -1, PREG_SPLIT_NO_EMPTY);
 
-            // 単語をループで回す
-            if (Auth::user()->isAdmin()) {
-                foreach ($keywords as $word) {
-                    $query->orWhereHas('sections', function ($query) use ($word) {
+            return $query->whereHas('sections', function ($query) use ($keywords) {
+                foreach ($keywords as $index => $word) {
+                    // 最初のキーワードに対してはwhereを使用し、それ以降のキーワードに対してはorWhereを使用
+                    if ($index === 0) {
                         $query->where('name', 'like', '%' . $word . '%');
-                    });
+                    } else {
+                        $query->orWhere('name', 'like', '%' . $word . '%');
+                    }
                 }
-            } else {
-                $company_id = Auth::user()->company_id;
-                $query->where('company_id', $company_id)->where(function ($query) use ($keywords) {
-                    $query->whereHas('sections', function ($query) use ($keywords) {
-                        foreach ($keywords as $index => $word) {
-                            // 最初のキーワードに対してはwhereを使用し、それ以降のキーワードに対してはorWhereを使用
-                            if ($index === 0) {
-                                $query->where('name', 'like', '%' . $word . '%');
-                            } else {
-                                $query->orWhere('name', 'like', '%' . $word . '%');
-                            }
-                        }
-                    });
-                });
-            }
-            return $query;
-        } else {
-            return;
-        }
+            });
+        });
     }
 }

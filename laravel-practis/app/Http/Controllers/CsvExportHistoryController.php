@@ -22,7 +22,13 @@ class CsvExportHistoryController extends Controller
     {
         $searchType = $request->search_type;
         $searchKeyword = $request->search_keyword;
-        $users = User::query()->with(['company', 'sections'])->keywordSearch($searchType, $searchKeyword)->get();
+        $users = User::query()
+                 ->with(['company', 'sections'])
+                 ->isNotAdmin($request)
+                 ->searchUser($request)
+                 ->searchCompany($request)
+                 ->searchSection($request)
+                 ->paginate()->withQueryString();
 
         $file_name = sprintf('users-%s.csv', now()->format('YmdHis'));
         $stream = $this->createCsv($users);
