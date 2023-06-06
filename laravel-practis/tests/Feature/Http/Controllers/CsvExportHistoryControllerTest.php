@@ -56,6 +56,10 @@ class CsvExportHistoryControllerTest extends TestCase
 
         $response = $this->actingAs($this->user)->post($url);
         $response->assertStatus(200);
+
+        $csv = CsvExportHistory::with('download_user')->get();
+        $this->assertNotEmpty($csv);
+
         $response->assertDownload();
     }
 

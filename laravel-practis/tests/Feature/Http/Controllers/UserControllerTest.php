@@ -52,6 +52,13 @@ class UserControllerTest extends TestCase
         $this->adminSection->users()->attach($this->admin->id);
     }
 
+    public function test_index_by_admin(): void
+    {
+        $url = route('users.index');
+
+        $this->actingAs($this->admin)->get($url)->assertStatus(200);
+    }
+
     public function test_index_search_user_by_user(): void
     {
         $url = route('users.index', [
@@ -81,6 +88,17 @@ class UserControllerTest extends TestCase
         $response = $this->actingAs($this->admin)->get($url);
         $response->assertStatus(200);
         $response->assertSee('サンプルユーザー');
+
+        // 複数ワードで検索
+        $url = route('users.index', [
+            'search_type' => 'user',
+            'search_keyword' => 'ユーザー アドミン',
+        ]);
+
+        $response = $this->actingAs($this->admin)->get($url);
+        $response->assertStatus(200);
+        $response->assertSee('サンプルユーザー');
+        $response->assertSee('サンプルアドミン');
 
         $url = route('users.index', [
             'search_type' => 'user',
@@ -145,6 +163,24 @@ class UserControllerTest extends TestCase
         $response = $this->actingAs($this->user)->get($url);
         $response->assertStatus(200);
         $response->assertSee('サンプル部署');
+
+        $this->company->sections()->create([
+           'name' => 'テスト部署'
+        ]);
+
+        $this->company->sections->last()->users()->attach($this->user->id);
+
+        // 複数ワードで検索
+        $url = route('users.index', [
+            'search_type' => 'section',
+            'search_keyword' => 'サンプル テスト',
+        ]);
+
+        // ログイン状態で検索ワードを入力して検索
+        $response = $this->actingAs($this->user)->get($url);
+        $response->assertStatus(200);
+        $response->assertSee('サンプル部署');
+        $response->assertSee('テスト部署');
 
         $url = route('users.index', [
             'search_type' => 'section',

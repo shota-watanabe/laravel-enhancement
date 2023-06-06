@@ -22,14 +22,18 @@ class CsvExportHistoryController extends Controller
     {
         $searchType = $request->search_type;
         $searchKeyword = $request->search_keyword;
-        $user = New User();
-        $users = $user->keywordSearch($searchType, $searchKeyword);
+        $users = User::query()
+                 ->with(['company', 'sections'])
+                 ->isNotAdmin($request)
+                 ->searchUser($request)
+                 ->searchCompany($request)
+                 ->searchSection($request)
+                 ->paginate()->withQueryString();
 
         $file_name = sprintf('users-%s.csv', now()->format('YmdHis'));
         $stream = $this->createCsv($users);
         Storage::put($file_name, $stream);
-        CsvExportHistory::create([
-            'download_user_id' => Auth::user()->id,
+        Auth::user()->csv_export_histories()->create([
             'file_name' => $file_name,
         ]);
         return Storage::download($file_name);
